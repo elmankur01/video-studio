@@ -526,7 +526,7 @@
 
                 const dataStr = JSON.stringify(payload);
 
-                // Прямая отправка данных через Telegram WebApp
+                // 1. Прямая отправка данных через Telegram WebApp sendData
                 if (tg && typeof tg.sendData === 'function') {
                     try {
                         tg.sendData(dataStr);
@@ -537,7 +537,7 @@
                     }
                 }
 
-                // Резервный метод: компактный start deep link
+                // 2. Резервный метод: глубокая ссылка в бот
                 const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                 const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
                 const dMap = {"tl": "1", "tr": "2", "bl": "3", "br": "4"};
@@ -551,44 +551,19 @@
                 const hasUrl = urlVal ? "1" : "0";
                 const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
                 const botUrl = `https://t.me/Vide_oro_bot?start=${shortParam}`;
-                const tgAppUrl = `tg://resolve?domain=Vide_oro_bot&start=${shortParam}`;
 
-                // 1. Попытка нативного openTelegramLink
-                try {
-                    if (tg && typeof tg.openTelegramLink === 'function') {
-                        tg.openTelegramLink(botUrl);
-                    }
-                } catch (e) {
-                    console.log("openTelegramLink error:", e);
+                // Копируем команду в буфер для надежности
+                const cmdText = `/start ${shortParam}`;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(cmdText);
                 }
 
-                // 2. Универсальный редирект через схему tg://
-                setTimeout(() => {
-                    try {
-                        window.location.href = tgAppUrl;
-                    } catch (e) {
-                        window.location.href = botUrl;
-                    }
-                }, 100);
-
-                // 3. Fallback: если Telegram все еще держит открытым окно, предлагаем скопировать команду
-                setTimeout(() => {
-                    const cmdText = `/start ${shortParam}`;
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(cmdText);
-                    }
-                    if (tg && typeof tg.showPopup === 'function') {
-                        tg.showPopup({
-                            title: '⚡ Готово к монтажу!',
-                            message: 'Нажмите «Открыть чат» или отправьте скопированную команду в бот.',
-                            buttons: [{ type: 'close', text: 'Закрыть и перейти в чат' }]
-                        }, () => {
-                            if (tg.close) tg.close();
-                        });
-                    } else if (tg && typeof tg.close === 'function') {
-                        tg.close();
-                    }
-                }, 700);
+                if (tg && typeof tg.openTelegramLink === 'function') {
+                    tg.openTelegramLink(botUrl);
+                    setTimeout(() => { if (tg.close) tg.close(); }, 200);
+                } else {
+                    window.location.href = botUrl;
+                }
             } catch (err) {
                 alert("Ошибка: " + err.message);
             }
