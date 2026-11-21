@@ -20,10 +20,6 @@
             --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
             --accent-glow: 0 0 20px rgba(56, 189, 248, 0.25);
             
-            --success: #34d399;
-            --danger: #f87171;
-            
-            --radius-sm: 10px;
             --radius-md: 14px;
             --radius-lg: 18px;
             --radius-pill: 9999px;
@@ -44,21 +40,20 @@
             background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-color) 70%);
             color: var(--text-main);
             padding: 16px;
-            padding-bottom: calc(20px + env(safe-area-inset-bottom, 20px));
+            padding-bottom: calc(24px + env(safe-area-inset-bottom, 20px));
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 4px 2px;
+            padding: 2px 2px;
         }
 
         .brand {
@@ -99,70 +94,43 @@
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        /* Card Section */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            transition: border-color 0.2s ease, transform 0.15s ease;
+            gap: 12px;
+            transition: border-color 0.2s ease;
         }
 
         .card:focus-within {
             border-color: var(--card-border-active);
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
         .card-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.6px;
             display: flex;
             align-items: center;
-            gap: 7px;
-        }
-
-        .card-title svg {
-            width: 16px;
-            height: 16px;
-            stroke: var(--accent-cyan);
-        }
-
-        /* Inputs */
-        .inputs-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .input-box {
-            display: flex;
-            flex-direction: column;
             gap: 6px;
         }
 
-        .input-box label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-muted);
+        .card-title svg {
+            width: 15px;
+            height: 15px;
+            stroke: var(--accent-cyan);
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="url"] {
             width: 100%;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid var(--card-border);
@@ -176,13 +144,30 @@
             user-select: text;
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="url"]:focus {
             border-color: var(--accent-cyan);
             background: rgba(15, 23, 42, 0.85);
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
         }
 
-        /* Quality Segmented Control */
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-box label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
         .segmented-control {
             display: flex;
             background: rgba(15, 23, 42, 0.6);
@@ -194,15 +179,15 @@
 
         .segment-btn {
             flex: 1;
-            padding: 10px 8px;
+            padding: 10px 6px;
             border-radius: 10px;
             border: none;
             background: transparent;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s;
             text-align: center;
         }
 
@@ -213,7 +198,6 @@
             box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
         }
 
-        /* Corners Grid for Delogo */
         .corner-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -224,12 +208,12 @@
             background: rgba(15, 23, 42, 0.5);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
-            padding: 12px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -242,8 +226,8 @@
         }
 
         .corner-indicator {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 6px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--card-border);
@@ -251,7 +235,6 @@
             align-items: center;
             justify-content: center;
             font-size: 11px;
-            transition: all 0.2s;
         }
 
         .corner-btn.active .corner-indicator {
@@ -259,12 +242,6 @@
             color: #090d16;
             border-color: transparent;
             font-weight: bold;
-        }
-
-        /* Submit Button */
-        .action-container {
-            margin-top: auto;
-            padding-top: 8px;
         }
 
         .btn-apply {
@@ -282,89 +259,98 @@
             gap: 8px;
             cursor: pointer;
             box-shadow: 0 6px 24px rgba(56, 189, 248, 0.35);
-            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 6px;
         }
 
         .btn-apply:active {
             transform: scale(0.975);
             box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
         }
-
-        .btn-apply svg {
-            width: 18px;
-            height: 18px;
-            stroke: #090d16;
-            stroke-width: 2.4;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
         <div class="brand">
             <div class="brand-icon">🎬</div>
             <div class="brand-text">
                 <h1>Video Studio Pro</h1>
-                <p>Панель быстрого монтажа</p>
+                <p>Скачивание & AI Монтаж в один клик</p>
             </div>
         </div>
-        <div class="chip">Telegram Native</div>
+        <div class="chip">All-in-One</div>
     </div>
 
-    <!-- 1. Обрезка -->
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-                Интервал обрезки
-            </div>
+    <!-- 1. Ссылка на видео -->
+    <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Ссылка на видео (YouTube, Reels, TikTok, VK)
         </div>
-        <div class="inputs-row">
-            <div class="input-box">
-                <label>Старт (ММ:СС)</label>
-                <input type="text" id="trimStart" placeholder="Опционально, напр. 0:05" inputmode="decimal">
-            </div>
-            <div class="input-box">
-                <label>Финиш (ММ:СС)</label>
-                <input type="text" id="trimEnd" placeholder="Опционально, напр. 0:30" inputmode="decimal">
-            </div>
-        </div>
+        <input type="url" id="videoUrl" placeholder="Вставьте ссылку https://..." autofocus>
     </div>
 
-    <!-- 2. Разрешение -->
+    <!-- 2. Выбор качества -->
     <div class="card">
-        <div class="card-header">
-            <div class="card-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                Выходное качество
-            </div>
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Качество видео
         </div>
         <div class="segmented-control">
             <button class="segment-btn active" onclick="setQuality(this, '720')">720p HD</button>
             <button class="segment-btn" onclick="setQuality(this, '480')">480p SD</button>
             <button class="segment-btn" onclick="setQuality(this, '360')">360p Eco</button>
+            <button class="segment-btn" onclick="setQuality(this, 'mp3')">🎵 MP3</button>
         </div>
     </div>
 
-    <!-- 3. Наложение текста -->
+    <!-- 3. Вирусные автосубтитры с переводом -->
     <div class="card">
-        <div class="card-header">
-            <div class="card-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-                Текст / Титры внизу
-            </div>
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            🔥 AI Автосубтитры & Перевод
         </div>
-        <input type="text" id="captionText" placeholder="Например: Мой блог @channel">
+        <div class="segmented-control">
+            <button class="segment-btn active" onclick="setSubtitles(this, 'none')">Без субтитров</button>
+            <button class="segment-btn" onclick="setSubtitles(this, 'ru')">🇷🇺 Русский</button>
+            <button class="segment-btn" onclick="setSubtitles(this, 'trans_ru')">🇬🇧➔🇷🇺 На рус</button>
+            <button class="segment-btn" onclick="setSubtitles(this, 'trans_en')">🇷🇺➔🇬🇧 На англ</button>
+        </div>
     </div>
 
-    <!-- 4. Удаление водяного знака -->
+    <!-- 4. Обрезка -->
     <div class="card">
-        <div class="card-header">
-            <div class="card-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Удаление водяного знака
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+            Интервал обрезки (опционально)
+        </div>
+        <div class="inputs-row">
+            <div class="input-box">
+                <label>Старт (ММ:СС)</label>
+                <input type="text" id="trimStart" placeholder="0:00" inputmode="decimal">
             </div>
+            <div class="input-box">
+                <label>Финиш (ММ:СС)</label>
+                <input type="text" id="trimEnd" placeholder="Конец" inputmode="decimal">
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Текст на видео -->
+    <div class="card">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Текст / Титры внизу (опционально)
+        </div>
+        <input type="text" id="captionText" placeholder="Например: Мой канал @channel">
+    </div>
+
+    <!-- 6. Удаление знака -->
+    <div class="card">
+        <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Удалить водяной знак (угол)
         </div>
         <div class="corner-grid">
             <div class="corner-btn" onclick="toggleCorner(this, 'tl')">
@@ -379,20 +365,18 @@
                 <div class="corner-indicator">↙</div>
                 <span>Снизу слева</span>
             </div>
-            <div class="corner-btn active" onclick="toggleCorner(this, 'br')">
-                <div class="corner-indicator">✓</div>
+            <div class="corner-btn" onclick="toggleCorner(this, 'br')">
+                <div class="corner-indicator">↘</div>
                 <span>Снизу справа</span>
             </div>
         </div>
     </div>
 
-    <!-- Action -->
-    <div class="action-container">
-        <button class="btn-apply" onclick="applyChanges()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Применить в боте
-        </button>
-    </div>
+    <!-- Кнопка запуска -->
+    <button class="btn-apply" onclick="applyChanges()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Скачать & Смонтировать ⚡
+    </button>
 
     <script>
         const tg = window.Telegram?.WebApp;
@@ -402,12 +386,20 @@
         }
 
         let currentQuality = "720";
-        let currentDelogo = "br";
+        let currentSubtitles = "none";
+        let currentDelogo = null;
 
         function setQuality(btn, q) {
-            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+            btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentQuality = q;
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+
+        function setSubtitles(btn, s) {
+            btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSubtitles = s;
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
 
@@ -415,7 +407,7 @@
             const isAlreadyActive = btn.classList.contains('active');
             document.querySelectorAll('.corner-btn').forEach(b => {
                 b.classList.remove('active');
-                b.querySelector('.corner-indicator').textContent = b.querySelector('.corner-indicator').getAttribute('data-default') || b.querySelector('.corner-indicator').textContent.replace('✓', getArrow(b));
+                b.querySelector('.corner-indicator').textContent = b.querySelector('.corner-indicator').getAttribute('data-def') || b.querySelector('.corner-indicator').textContent.replace('✓', getArrow(b));
             });
 
             if (!isAlreadyActive) {
@@ -437,10 +429,11 @@
         }
 
         function applyChanges() {
+            const urlVal = document.getElementById('videoUrl').value.trim();
             const startVal = document.getElementById('trimStart').value.trim();
             const endVal = document.getElementById('trimEnd').value.trim();
+            
             let trimRange = null;
-
             if (startVal || endVal) {
                 trimRange = (startVal || "0:00") + '-' + (endVal || "");
             }
@@ -448,8 +441,10 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 
             const payload = {
+                url: urlVal || null,
                 trim: trimRange,
                 quality: currentQuality,
+                subtitles: currentSubtitles,
                 caption: document.getElementById('captionText').value.trim(),
                 delogo: currentDelogo
             };
@@ -458,7 +453,7 @@
                 tg.sendData(JSON.stringify(payload));
                 tg.close();
             } else {
-                alert("Данные для отправки:\n" + JSON.stringify(payload, null, 2));
+                alert("Данные задачи:\n" + JSON.stringify(payload, null, 2));
             }
         }
     </script>
