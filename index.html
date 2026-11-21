@@ -267,6 +267,15 @@
             transform: scale(0.975);
             box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
         }
+
+        .source-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -276,19 +285,22 @@
             <div class="brand-icon">🎬</div>
             <div class="brand-text">
                 <h1>Video Studio Pro</h1>
-                <p>Скачивание & AI Монтаж в один клик</p>
+                <p>Монтаж ссылок и готовых видео</p>
             </div>
         </div>
         <div class="chip">All-in-One</div>
     </div>
 
-    <!-- 1. Ссылка на видео -->
+    <!-- 1. Источник видео (Ссылка или уже отправленный файл) -->
     <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Ссылка на видео (YouTube, Reels, TikTok, VK)
+            Ссылка (если нужно скачать)
         </div>
-        <input type="url" id="videoUrl" placeholder="Вставьте ссылку https://..." autofocus>
+        <input type="url" id="videoUrl" placeholder="Вставьте ссылку https://... (или оставьте пустым)">
+        <div class="source-hint">
+            💡 <span>Если видео <b>уже отправлено в чат</b> — оставьте поле пустым, бот смонтирует его!</span>
+        </div>
     </div>
 
     <!-- 2. Выбор качества -->
@@ -375,7 +387,7 @@
     <!-- Кнопка запуска -->
     <button class="btn-apply" onclick="applyChanges()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Скачать & Смонтировать ⚡
+        Применить & Смонтировать ⚡
     </button>
 
     <script>
