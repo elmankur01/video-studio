@@ -323,11 +323,11 @@
         <div class="inputs-row">
             <div class="input-box">
                 <label>Старт (ММ:СС)</label>
-                <input type="text" id="trimStart" placeholder="0:00" value="0:00">
+                <input type="text" id="trimStart" placeholder="Опционально, напр. 0:05" inputmode="decimal">
             </div>
             <div class="input-box">
                 <label>Финиш (ММ:СС)</label>
-                <input type="text" id="trimEnd" placeholder="0:30" value="0:30">
+                <input type="text" id="trimEnd" placeholder="Опционально, напр. 0:30" inputmode="decimal">
             </div>
         </div>
     </div>
@@ -437,10 +437,18 @@
         }
 
         function applyChanges() {
+            const startVal = document.getElementById('trimStart').value.trim();
+            const endVal = document.getElementById('trimEnd').value.trim();
+            let trimRange = null;
+
+            if (startVal || endVal) {
+                trimRange = (startVal || "0:00") + '-' + (endVal || "");
+            }
+
             if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 
             const payload = {
-                trim: document.getElementById('trimStart').value.trim() + '-' + document.getElementById('trimEnd').value.trim(),
+                trim: trimRange,
                 quality: currentQuality,
                 caption: document.getElementById('captionText').value.trim(),
                 delogo: currentDelogo
