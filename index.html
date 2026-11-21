@@ -426,6 +426,11 @@
         if (tg) {
             tg.expand();
             tg.ready();
+
+            // Включаем нативную большую главную кнопку Telegram внизу
+            tg.MainButton.setText("⚡ СМОНТИРОВАТЬ ВИДЕО");
+            tg.MainButton.show();
+            tg.MainButton.onClick(applyChanges);
         }
 
         let selectedFile = null;
@@ -484,49 +489,63 @@
             return '↘';
         }
 
-        async function applyChanges() {
-            const urlVal = document.getElementById('videoUrl').value.trim();
-            const startVal = document.getElementById('trimStart').value.trim();
-            const endVal = document.getElementById('trimEnd').value.trim();
-            
-            let trimRange = null;
-            if (startVal || endVal) {
-                trimRange = (startVal || "0:00") + '-' + (endVal || "");
-            }
+        function applyChanges() {
+            try {
+                const urlInput = document.getElementById('videoUrl');
+                const urlVal = urlInput ? urlInput.value.trim() : '';
 
-            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                const startInput = document.getElementById('trimStart');
+                const startVal = startInput ? startInput.value.trim() : '';
 
-            const payload = {
-                url: urlVal || null,
-                file_name: selectedFile ? selectedFile.name : null,
-                is_gallery: !!selectedFile,
-                trim: trimRange,
-                quality: currentQuality,
-                subtitles: currentSubtitles,
-                caption: document.getElementById('captionText').value.trim(),
-                delogo: currentDelogo
-            };
+                const endInput = document.getElementById('trimEnd');
+                const endVal = endInput ? endInput.value.trim() : '';
 
-            const dataStr = JSON.stringify(payload);
-
-            if (tg && typeof tg.sendData === 'function') {
-                try {
-                    tg.sendData(dataStr);
-                    tg.close();
-                    return;
-                } catch (e) {
-                    console.error("sendData error:", e);
+                let trimRange = null;
+                if (startVal || endVal) {
+                    trimRange = (startVal || "0:00") + '-' + (endVal || "");
                 }
-            }
 
-            // Fallback для открытия через MenuButton / ссылку: отправляем данные через Telegram deep-link
-            if (tg) {
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+                const captionInput = document.getElementById('captionText');
+                const captionVal = captionInput ? captionInput.value.trim() : '';
+
+                const payload = {
+                    url: urlVal || null,
+                    file_name: selectedFile ? selectedFile.name : null,
+                    is_gallery: !!selectedFile,
+                    trim: trimRange,
+                    quality: currentQuality,
+                    subtitles: currentSubtitles,
+                    caption: captionVal,
+                    delogo: currentDelogo
+                };
+
+                const dataStr = JSON.stringify(payload);
+
+                // 1. Попытка через нативный sendData (если открыто с кнопки чата)
+                if (tg && typeof tg.sendData === 'function') {
+                    try {
+                        tg.sendData(dataStr);
+                        tg.close();
+                        return;
+                    } catch (err) {
+                        console.log("sendData не доступен для MenuButton, используем deep-link:", err);
+                    }
+                }
+
+                // 2. Универсальная отправка для MenuButton через ссылку бота
                 const encoded = encodeURIComponent(dataStr);
-                const botUsername = "Vide_oro_bot";
-                tg.openTelegramLink(`https://t.me/${botUsername}?start=app_${encoded}`);
-                tg.close();
-            } else {
-                alert("Данные для отправки:\n" + JSON.stringify(payload, null, 2));
+                const botUrl = `https://t.me/Vide_oro_bot?start=app_${encoded}`;
+
+                if (tg && typeof tg.openTelegramLink === 'function') {
+                    tg.openTelegramLink(botUrl);
+                    tg.close();
+                } else {
+                    window.location.href = botUrl;
+                }
+            } catch (globalErr) {
+                alert("Ошибка: " + globalErr.message);
             }
         }
     </script>
