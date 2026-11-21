@@ -499,6 +499,7 @@
             const payload = {
                 url: urlVal || null,
                 file_name: selectedFile ? selectedFile.name : null,
+                is_gallery: !!selectedFile,
                 trim: trimRange,
                 quality: currentQuality,
                 subtitles: currentSubtitles,
@@ -506,13 +507,23 @@
                 delogo: currentDelogo
             };
 
-            // Если прикреплен файл из галереи, уведомляем пользователя
-            if (selectedFile) {
-                payload.is_gallery = true;
+            const dataStr = JSON.stringify(payload);
+
+            if (tg && typeof tg.sendData === 'function') {
+                try {
+                    tg.sendData(dataStr);
+                    tg.close();
+                    return;
+                } catch (e) {
+                    console.error("sendData error:", e);
+                }
             }
 
+            // Fallback для открытия через MenuButton / ссылку: отправляем данные через Telegram deep-link
             if (tg) {
-                tg.sendData(JSON.stringify(payload));
+                const encoded = encodeURIComponent(dataStr);
+                const botUsername = "Vide_oro_bot";
+                tg.openTelegramLink(`https://t.me/${botUsername}?start=app_${encoded}`);
                 tg.close();
             } else {
                 alert("Данные для отправки:\n" + JSON.stringify(payload, null, 2));
