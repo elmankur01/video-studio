@@ -150,6 +150,41 @@
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
         }
 
+        /* Загрузка из галереи */
+        .upload-dropzone {
+            border: 2px dashed rgba(56, 189, 248, 0.35);
+            border-radius: var(--radius-md);
+            padding: 18px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            background: rgba(56, 189, 248, 0.04);
+            transition: all 0.2s;
+        }
+
+        .upload-dropzone:active, .upload-dropzone.has-file {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--accent-cyan);
+        }
+
+        .upload-icon {
+            font-size: 26px;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .upload-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
         .inputs-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -267,15 +302,6 @@
             transform: scale(0.975);
             box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
         }
-
-        .source-hint {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.4;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
     </style>
 </head>
 <body>
@@ -285,29 +311,35 @@
             <div class="brand-icon">🎬</div>
             <div class="brand-text">
                 <h1>Video Studio Pro</h1>
-                <p>Монтаж ссылок и готовых видео</p>
+                <p>Галерея, Ссылки & AI Монтаж</p>
             </div>
         </div>
         <div class="chip">All-in-One</div>
     </div>
 
-    <!-- 1. Источник видео (Ссылка или уже отправленный файл) -->
+    <!-- 1. Выбор источника видео (Галерея или Ссылка) -->
     <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
         <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Ссылка (если нужно скачать)
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            1. Выберите видео из галереи
         </div>
-        <input type="url" id="videoUrl" placeholder="Вставьте ссылку https://... (или оставьте пустым)">
-        <div class="source-hint">
-            💡 <span>Если видео <b>уже отправлено в чат</b> — оставьте поле пустым, бот смонтирует его!</span>
+        
+        <input type="file" id="galleryInput" accept="video/*" style="display: none;" onchange="handleFileSelect(this)">
+        <div class="upload-dropzone" id="dropZone" onclick="document.getElementById('galleryInput').click()">
+            <span class="upload-icon">📱</span>
+            <span class="upload-text" id="uploadStatus">Нажмите, чтобы выбрать из Галереи</span>
+            <span class="upload-sub" id="uploadSub">MP4, MOV, Любое видео с телефона</span>
         </div>
+
+        <div style="text-align: center; font-size: 11px; color: var(--text-muted); margin: 2px 0;">— ИЛИ ВСТАВЬТЕ ССЫЛКУ —</div>
+        <input type="url" id="videoUrl" placeholder="https://youtube.com/... или reels/tiktok">
     </div>
 
     <!-- 2. Выбор качества -->
     <div class="card">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            Качество видео
+            2. Качество видео
         </div>
         <div class="segmented-control">
             <button class="segment-btn active" onclick="setQuality(this, '720')">720p HD</button>
@@ -321,7 +353,7 @@
     <div class="card">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            🔥 AI Автосубтитры & Перевод
+            3. 🔥 AI Автосубтитры & Перевод
         </div>
         <div class="segmented-control">
             <button class="segment-btn active" onclick="setSubtitles(this, 'none')">Без субтитров</button>
@@ -335,7 +367,7 @@
     <div class="card">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-            Интервал обрезки (опционально)
+            4. Интервал обрезки (опционально)
         </div>
         <div class="inputs-row">
             <div class="input-box">
@@ -353,16 +385,16 @@
     <div class="card">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
-            Текст / Титры внизу (опционально)
+            5. Текст / Титры внизу (опционально)
         </div>
-        <input type="text" id="captionText" placeholder="Например: Мой канал @channel">
+        <input type="text" id="captionText" placeholder="Например: Мой блог @channel">
     </div>
 
     <!-- 6. Удаление знака -->
     <div class="card">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Удалить водяной знак (угол)
+            6. Удалить водяной знак (угол)
         </div>
         <div class="corner-grid">
             <div class="corner-btn" onclick="toggleCorner(this, 'tl')">
@@ -384,7 +416,6 @@
         </div>
     </div>
 
-    <!-- Кнопка запуска -->
     <button class="btn-apply" onclick="applyChanges()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Применить & Смонтировать ⚡
@@ -397,9 +428,22 @@
             tg.ready();
         }
 
+        let selectedFile = null;
         let currentQuality = "720";
         let currentSubtitles = "none";
         let currentDelogo = null;
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                const sizeMb = (selectedFile.size / (1024 * 1024)).toFixed(1);
+                document.getElementById('uploadStatus').textContent = `✅ Выбрано: ${selectedFile.name}`;
+                document.getElementById('uploadSub').textContent = `Размер: ${sizeMb} МБ. Готово к монтажу!`;
+                document.getElementById('dropZone').classList.add('has-file');
+                document.getElementById('videoUrl').value = '';
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
 
         function setQuality(btn, q) {
             btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
@@ -440,7 +484,7 @@
             return '↘';
         }
 
-        function applyChanges() {
+        async function applyChanges() {
             const urlVal = document.getElementById('videoUrl').value.trim();
             const startVal = document.getElementById('trimStart').value.trim();
             const endVal = document.getElementById('trimEnd').value.trim();
@@ -454,6 +498,7 @@
 
             const payload = {
                 url: urlVal || null,
+                file_name: selectedFile ? selectedFile.name : null,
                 trim: trimRange,
                 quality: currentQuality,
                 subtitles: currentSubtitles,
@@ -461,11 +506,16 @@
                 delogo: currentDelogo
             };
 
+            // Если прикреплен файл из галереи, уведомляем пользователя
+            if (selectedFile) {
+                payload.is_gallery = true;
+            }
+
             if (tg) {
                 tg.sendData(JSON.stringify(payload));
                 tg.close();
             } else {
-                alert("Данные задачи:\n" + JSON.stringify(payload, null, 2));
+                alert("Данные для отправки:\n" + JSON.stringify(payload, null, 2));
             }
         }
     </script>
