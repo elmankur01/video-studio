@@ -534,9 +534,10 @@
                     }
                 }
 
-                // 2. Универсальная отправка для MenuButton через ссылку бота
-                const encoded = encodeURIComponent(dataStr);
-                const botUrl = `https://t.me/Vide_oro_bot?start=app_${encoded}`;
+                // 2. Универсальная отправка для MenuButton: Telegram разрешает в ?start= только [A-Za-z0-9_-]
+                // Кодируем JSON в Base64 без запрещенных символов
+                const b64 = btoa(unescape(encodeURIComponent(dataStr))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                const botUrl = `https://t.me/Vide_oro_bot?start=m_${b64}`;
 
                 if (tg && typeof tg.openTelegramLink === 'function') {
                     tg.openTelegramLink(botUrl);
