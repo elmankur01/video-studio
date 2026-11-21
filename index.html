@@ -548,7 +548,8 @@
                 if (trimRange) {
                     tStr = trimRange.replace(/:/g, "m").replace(/-/g, "_");
                 }
-                const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}`;
+                const hasUrl = urlVal ? "1" : "0";
+                const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
                 const botUrl = `https://t.me/Vide_oro_bot?start=${shortParam}`;
 
                 if (tg && typeof tg.openTelegramLink === 'function') {
