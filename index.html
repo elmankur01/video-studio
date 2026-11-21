@@ -551,13 +551,44 @@
                 const hasUrl = urlVal ? "1" : "0";
                 const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
                 const botUrl = `https://t.me/Vide_oro_bot?start=${shortParam}`;
+                const tgAppUrl = `tg://resolve?domain=Vide_oro_bot&start=${shortParam}`;
 
-                if (tg && typeof tg.openTelegramLink === 'function') {
-                    tg.openTelegramLink(botUrl);
-                    setTimeout(() => { if (tg.close) tg.close(); }, 300);
-                } else {
-                    window.location.href = botUrl;
+                // 1. Попытка нативного openTelegramLink
+                try {
+                    if (tg && typeof tg.openTelegramLink === 'function') {
+                        tg.openTelegramLink(botUrl);
+                    }
+                } catch (e) {
+                    console.log("openTelegramLink error:", e);
                 }
+
+                // 2. Универсальный редирект через схему tg://
+                setTimeout(() => {
+                    try {
+                        window.location.href = tgAppUrl;
+                    } catch (e) {
+                        window.location.href = botUrl;
+                    }
+                }, 100);
+
+                // 3. Fallback: если Telegram все еще держит открытым окно, предлагаем скопировать команду
+                setTimeout(() => {
+                    const cmdText = `/start ${shortParam}`;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(cmdText);
+                    }
+                    if (tg && typeof tg.showPopup === 'function') {
+                        tg.showPopup({
+                            title: '⚡ Готово к монтажу!',
+                            message: 'Нажмите «Открыть чат» или отправьте скопированную команду в бот.',
+                            buttons: [{ type: 'close', text: 'Закрыть и перейти в чат' }]
+                        }, () => {
+                            if (tg.close) tg.close();
+                        });
+                    } else if (tg && typeof tg.close === 'function') {
+                        tg.close();
+                    }
+                }, 700);
             } catch (err) {
                 alert("Ошибка: " + err.message);
             }
