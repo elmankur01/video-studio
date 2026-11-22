@@ -421,6 +421,17 @@
         Применить & Смонтировать ⚡
     </button>
 
+    <!-- Встроенное гарантированное модальное окно на чистом HTML/CSS -->
+    <div id="statusModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+        <div style="background:#131b2e; border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:26px 20px; max-width:340px; width:100%; text-align:center; box-shadow:0 12px 40px rgba(0,0,0,0.8);">
+            <div style="font-size:38px; margin-bottom:12px;">⚡</div>
+            <h3 style="color:#f8fafc; font-size:19px; font-weight:700; margin-bottom:10px;">Готово к монтажу!</h3>
+            <p style="color:#94a3b8; font-size:14px; line-height:1.45; margin-bottom:22px;">Нажмите кнопку ниже, чтобы вернуться в чат и получить готовое видео:</p>
+            <a id="modalActionBtn" href="#" style="display:block; background:linear-gradient(135deg, #38bdf8 0%, #6366f1 100%); color:#090d16; font-weight:700; font-size:16px; padding:15px; border-radius:14px; text-decoration:none; margin-bottom:12px; box-shadow:0 4px 15px rgba(56,189,248,0.4);">🚀 ПЕРЕЙТИ В БОТ</a>
+            <button onclick="document.getElementById('statusModal').style.display='none'" style="background:transparent; border:none; color:#64748b; font-size:13px; cursor:pointer; padding:6px;">Закрыть</button>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram?.WebApp;
         if (tg) {
@@ -561,28 +572,22 @@
                     navigator.clipboard.writeText(cmdText).catch(() => {});
                 }
 
-                // Показываем подтверждение пользователю и вызываем переход
-                const msg = "⚡ Настройки применены!\n\nНажмите OK, чтобы перейти в бота и запустить монтаж.";
-                if (tg && typeof tg.showPopup === 'function') {
-                    tg.showPopup({
-                        title: "Video Studio Pro",
-                        message: msg,
-                        buttons: [{type: "ok", text: "Перейти в бот"}]
-                    }, function() {
-                        if (tg.openTelegramLink) {
+                // Показываем гарантированное модальное окно на странице
+                const modal = document.getElementById('statusModal');
+                const actionBtn = document.getElementById('modalActionBtn');
+                if (modal && actionBtn) {
+                    actionBtn.onclick = function(e) {
+                        e.preventDefault();
+                        if (tg && typeof tg.openTelegramLink === 'function') {
                             tg.openTelegramLink(webTgLink);
                         } else {
                             window.location.href = directTgLink;
                         }
-                        setTimeout(() => { if (tg.close) tg.close(); }, 300);
-                    });
-                } else if (tg && typeof tg.showAlert === 'function') {
-                    tg.showAlert(msg, function() {
-                        window.location.href = directTgLink;
-                        setTimeout(() => { if (tg.close) tg.close(); }, 300);
-                    });
+                        setTimeout(() => { if (tg?.close) tg.close(); }, 300);
+                    };
+                    modal.style.display = 'flex';
                 } else {
-                    alert(msg);
+                    alert("⚡ Настройки применены! Перехожу в чат...");
                     window.location.href = directTgLink;
                 }
             } catch (err) {
