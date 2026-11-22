@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#090d16">
     <title>Video Studio Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -33,6 +35,8 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         body {
@@ -40,13 +44,15 @@
             background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-color) 70%);
             color: var(--text-main);
             padding: 16px;
-            padding-bottom: calc(24px + env(safe-area-inset-bottom, 20px));
+            padding-bottom: calc(36px + env(safe-area-inset-bottom, 24px));
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             gap: 14px;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            max-width: 540px;
+            margin: 0 auto;
         }
 
         .header {
@@ -137,17 +143,41 @@
             border-radius: var(--radius-md);
             padding: 12px 14px;
             color: var(--text-main);
-            font-size: 14px;
+            font-size: 16px; /* 16px гарантирует отсутствие авто-зума на iOS Safari */
             font-weight: 500;
             outline: none;
             transition: all 0.2s;
             user-select: text;
+            -webkit-user-select: text;
         }
 
         input[type="text"]:focus, input[type="url"]:focus {
             border-color: var(--accent-cyan);
             background: rgba(15, 23, 42, 0.85);
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        /* Адаптивность для компактных экранов (iPhone SE / маленькие Android) */
+        @media (max-width: 360px) {
+            body {
+                padding: 12px 10px;
+                gap: 10px;
+            }
+            .card {
+                padding: 12px 12px;
+                gap: 10px;
+            }
+            .segmented-control {
+                flex-wrap: wrap;
+            }
+            .segment-btn {
+                min-width: calc(50% - 4px);
+                font-size: 11px;
+                padding: 8px 4px;
+            }
+            .corner-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Загрузка из галереи */
