@@ -526,18 +526,20 @@
 
                 const dataStr = JSON.stringify(payload);
 
-                // 1. Прямая отправка данных через Telegram WebApp sendData
+                // 1. Попытка прямой отправки через Telegram WebApp sendData (работает при открытии с клавиатуры)
+                let sentSuccessfully = false;
                 if (tg && typeof tg.sendData === 'function') {
                     try {
                         tg.sendData(dataStr);
+                        sentSuccessfully = true;
                         tg.close();
                         return;
                     } catch (e) {
-                        console.log("sendData error:", e);
+                        console.log("sendData failed or not supported in this context:", e);
                     }
                 }
 
-                // 2. Резервный метод: глубокая ссылка в бот
+                // 2. Если sendData недоступен (открыто не с Reply-клавиатуры или заблокирован клиентом)
                 const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                 const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
                 const dMap = {"tl": "1", "tr": "2", "bl": "3", "br": "4"};
@@ -550,19 +552,38 @@
                 }
                 const hasUrl = urlVal ? "1" : "0";
                 const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
-                const botUrl = `https://t.me/Vide_oro_bot?start=${shortParam}`;
-
-                // Копируем команду в буфер для надежности
                 const cmdText = `/start ${shortParam}`;
+                const directTgLink = `tg://resolve?domain=Vide_oro_bot&start=${shortParam}`;
+                const webTgLink = `https://t.me/Vide_oro_bot?start=${shortParam}`;
+
+                // Копируем команду в буфер обмена
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(cmdText);
+                    navigator.clipboard.writeText(cmdText).catch(() => {});
                 }
 
-                if (tg && typeof tg.openTelegramLink === 'function') {
-                    tg.openTelegramLink(botUrl);
-                    setTimeout(() => { if (tg.close) tg.close(); }, 200);
+                // Показываем подтверждение пользователю и вызываем переход
+                const msg = "⚡ Настройки применены!\n\nНажмите OK, чтобы перейти в бота и запустить монтаж.";
+                if (tg && typeof tg.showPopup === 'function') {
+                    tg.showPopup({
+                        title: "Video Studio Pro",
+                        message: msg,
+                        buttons: [{type: "ok", text: "Перейти в бот"}]
+                    }, function() {
+                        if (tg.openTelegramLink) {
+                            tg.openTelegramLink(webTgLink);
+                        } else {
+                            window.location.href = directTgLink;
+                        }
+                        setTimeout(() => { if (tg.close) tg.close(); }, 300);
+                    });
+                } else if (tg && typeof tg.showAlert === 'function') {
+                    tg.showAlert(msg, function() {
+                        window.location.href = directTgLink;
+                        setTimeout(() => { if (tg.close) tg.close(); }, 300);
+                    });
                 } else {
-                    window.location.href = botUrl;
+                    alert(msg);
+                    window.location.href = directTgLink;
                 }
             } catch (err) {
                 alert("Ошибка: " + err.message);
