@@ -519,10 +519,10 @@
             tg.expand();
             tg.ready();
 
-            // Включаем нативную большую главную кнопку Telegram внизу
-            tg.MainButton.setText("🔥 СОЗДАТЬ ВИРУСНЫЙ SHORTS");
-            tg.MainButton.show();
-            tg.MainButton.onClick(applyChanges);
+            // Скрываем нативный MainButton Telegram, чтобы не дублировать кнопку действия на странице
+            if (tg.MainButton) {
+                tg.MainButton.hide();
+            }
         }
 
         let selectedFile = null;
@@ -561,7 +561,7 @@
                 mountBtn.style.boxShadow = isViral ? '0 6px 24px rgba(245, 158, 11, 0.35)' : '0 6px 24px rgba(56, 189, 248, 0.35)';
             }
             if (tg?.MainButton) {
-                tg.MainButton.setText(isViral ? "🔥 СОЗДАТЬ ВИРУСНЫЙ SHORTS" : "⚡ СМОНТИРОВАТЬ ВИДЕО");
+                tg.MainButton.hide();
             }
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
