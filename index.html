@@ -414,11 +414,11 @@
         </div>
     </div>
 
-    <!-- 4. Обрезка -->
-    <div class="card manual-only-card" style="display: none;">
+    <!-- 4. Интервал видео (обрезка) -->
+    <div class="card" id="trimCard">
         <div class="card-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-            4. Интервал обрезки (опционально)
+            <span id="trimCardTitle">4. Интервал видео (опционально)</span>
         </div>
         <div class="inputs-row">
             <div class="input-box">
@@ -429,6 +429,9 @@
                 <label>Финиш (ММ:СС)</label>
                 <input type="text" id="trimEnd" placeholder="Конец" inputmode="text">
             </div>
+        </div>
+        <div id="trimHint" style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            💡 Оставьте пустым для авто-анализа со старта, либо укажите интервал (например <code>10:00-25:00</code>)
         </div>
     </div>
 
@@ -522,6 +525,18 @@
             document.querySelectorAll('.manual-only-card').forEach(c => {
                 c.style.display = isViral ? 'none' : 'block';
             });
+
+            const trimTitle = document.getElementById('trimCardTitle');
+            const trimHint = document.getElementById('trimHint');
+            if (trimTitle && trimHint) {
+                if (isViral) {
+                    trimTitle.textContent = '4. Интервал видео (опционально)';
+                    trimHint.innerHTML = '💡 Оставьте пустым для авто-анализа со старта, либо укажите интервал (например <code>10:00-25:00</code>)';
+                } else {
+                    trimTitle.textContent = '4. Интервал обрезки (опционально)';
+                    trimHint.innerHTML = 'Укажите время начала и окончания для вырезки фрагмента';
+                }
+            }
             
             const mountBtn = document.getElementById('mountBtn');
             if (mountBtn) {
