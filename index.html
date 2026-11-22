@@ -383,6 +383,22 @@
             <div>🎙 <b>Студийный звук:</b> Loudnorm -14 LUFS, очистка шума, без музыки</div>
             <div>🔥 <b>Неоновые субтитры:</b> анимация в стиле Shorts / Reels</div>
             <div style="margin-top: 5px; font-size: 10.5px; color: #94a3b8;">🕌 <i>Соответствие исламским нормам: строго без музыки и женщин</i></div>
+
+            <!-- Дополнительные кино-эффекты и звуки переходов по желанию -->
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 8px;">
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; cursor: pointer; user-select: none;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <span>🎬</span> <span><b>Кино-цвета</b> (Teal & Orange + Виньетка)</span>
+                    </span>
+                    <input type="checkbox" id="cinemaEffectsToggle" style="width: 17px; height: 17px; accent-color: #f59e0b; cursor: pointer;">
+                </label>
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; cursor: pointer; user-select: none;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <span>🔊</span> <span><b>Звуки переходов</b> (Whoosh SFX без музыки)</span>
+                    </span>
+                    <input type="checkbox" id="soundEffectsToggle" style="width: 17px; height: 17px; accent-color: #f59e0b; cursor: pointer;">
+                </label>
+            </div>
         </div>
     </div>
 
@@ -621,10 +637,17 @@
 
             const userId = tg?.initDataUnsafe?.user?.id || 7454934683;
 
+            const cinemaToggle = document.getElementById('cinemaEffectsToggle');
+            const soundToggle = document.getElementById('soundEffectsToggle');
+            const isCinema = (currentMode === "viral" && cinemaToggle) ? cinemaToggle.checked : false;
+            const isSfx = (currentMode === "viral" && soundToggle) ? soundToggle.checked : false;
+
             return {
                 user_id: userId,
                 mode: currentMode,
                 viral_mode: (currentMode === "viral"),
+                cinema_effects: isCinema,
+                sound_effects: isSfx,
                 url: urlVal || null,
                 file_name: selectedFile ? selectedFile.name : null,
                 is_gallery: !urlVal,
@@ -686,7 +709,11 @@
                 let shortParam;
 
                 if (payload.viral_mode) {
-                    shortParam = "s_viral";
+                    if (payload.cinema_effects || payload.sound_effects) {
+                        shortParam = "s_viral_cinema";
+                    } else {
+                        shortParam = "s_viral";
+                    }
                 } else {
                     const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                     const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
