@@ -565,19 +565,16 @@
                 const payload = getPayloadData();
                 const dataStr = JSON.stringify(payload);
 
-                // 1. Попытка нативной передачи sendData
-                // ВНИМАНИЕ: Telegram сам автоматически закрывает WebApp при успехе sendData!
-                // НЕ вызываем tg.close(), чтобы не убить процесс до отправки данных в Telegram!
+                // Если есть нативный sendData - вызываем его
                 if (tg && typeof tg.sendData === 'function') {
                     try {
                         tg.sendData(dataStr);
-                        return;
                     } catch (e) {
                         console.log("sendData error:", e);
                     }
                 }
 
-                // 2. Формируем прямой переход в бота
+                // 2. Гарантированный fallback через клипборд и переход в чат
                 const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                 const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
                 const dMap = {"tl": "1", "tr": "2", "bl": "3", "br": "4"};
@@ -591,23 +588,22 @@
                 const hasUrl = payload.url ? "1" : "0";
                 const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
                 const cmdText = `/start ${shortParam}`;
-                const directTgLink = `tg://resolve?domain=Vide_oro_bot&start=${shortParam}`;
                 const webTgLink = `https://t.me/Vide_oro_bot?start=${shortParam}`;
 
-                // Копируем команду в буфер обмена
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(cmdText).catch(() => {});
                 }
 
-                // Вызываем мгновенный переход в бот
+                // Показываем нативный алерт с подтверждением
+                alert("⚡ Команда монтажа сформирована!\n\nНажмите OK, чтобы перейти в бот.");
                 if (tg && typeof tg.openTelegramLink === 'function') {
                     tg.openTelegramLink(webTgLink);
                 } else {
-                    window.location.href = directTgLink;
+                    window.location.href = webTgLink;
                 }
-                setTimeout(() => { if (tg?.close) tg.close(); }, 300);
+                setTimeout(() => { if (tg?.close) tg.close(); }, 500);
             } catch (err) {
-                alert("Ошибка: " + err.message);
+                alert("Ошибка скрипта: " + err.message);
             }
         }
 
