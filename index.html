@@ -15,8 +15,8 @@
             --card-border: rgba(255, 255, 255, 0.08);
             --card-border-active: rgba(56, 189, 248, 0.45);
             
-            --text-main: var(--tg-theme-text-color, #f8fafc);
-            --text-muted: var(--tg-theme-hint-color, #94a3b8);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
             --accent-cyan: #38bdf8;
             --accent-indigo: #818cf8;
             --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
@@ -423,11 +423,11 @@
         <div class="inputs-row">
             <div class="input-box">
                 <label>Старт (ММ:СС)</label>
-                <input type="text" id="trimStart" placeholder="0:00" inputmode="decimal">
+                <input type="text" id="trimStart" placeholder="0:00" inputmode="text">
             </div>
             <div class="input-box">
                 <label>Финиш (ММ:СС)</label>
-                <input type="text" id="trimEnd" placeholder="Конец" inputmode="decimal">
+                <input type="text" id="trimEnd" placeholder="Конец" inputmode="text">
             </div>
         </div>
     </div>
@@ -612,7 +612,7 @@
                 viral_mode: (currentMode === "viral"),
                 url: urlVal || null,
                 file_name: selectedFile ? selectedFile.name : null,
-                is_gallery: !!selectedFile,
+                is_gallery: !urlVal,
                 trim: trimRange,
                 quality: currentQuality,
                 subtitles: currentSubtitles,
@@ -669,15 +669,9 @@
 
                 // 2. Кодируем параметры для fallback
                 let shortParam;
-                let desc;
-                let btnText;
 
                 if (payload.viral_mode) {
-                    shortParam = "viral";
-                    desc = `⚡ **Запрос на вирусный Shorts (AI Монтаж):**\n• Режим: 30–60с, Jump-Cuts пауз >1с, Dynamic Zoom 1.15x, студийный звук (-14 LUFS), вирусные субтитры (без музыки и посторонних лиц)`;
-                    if (payload.url) desc += `\n• Ссылка: ${payload.url}`;
-                    desc += `\n\n👇 Нажмите кнопку ниже для старта:`;
-                    btnText = "🎬 ЗАПУСТИТЬ ВИРУСНЫЙ МОНТАЖ ⚡";
+                    shortParam = "s_viral";
                 } else {
                     const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                     const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
@@ -691,15 +685,6 @@
                     }
                     const hasUrl = payload.url ? "1" : "0";
                     shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
-
-                    const qNames = {"7": "720p HD", "4": "480p SD", "3": "360p", "m": "MP3 Аудио"};
-                    const sNames = {"0": "Без субтитров", "r": "🇷🇺 Русские субтитры", "u": "🇬🇧➔🇷🇺 Перевод на русский", "e": "🇷🇺➔🇬🇧 Перевод на английский"};
-                    desc = `⚡ **Настройки монтажа из Studio Pro:**\n• Качество: ${qNames[qChar] || "720p"}\n• Субтитры: ${sNames[sChar] || "Без субтитров"}`;
-                    if (payload.trim) desc += `\n• Обрезка: ${payload.trim}`;
-                    if (payload.caption) desc += `\n• Текст: ${payload.caption}`;
-                    if (payload.url) desc += `\n• Ссылка: ${payload.url}`;
-                    desc += `\n\n👇 Нажмите кнопку ниже для старта:`;
-                    btnText = "🎬 ЗАПУСТИТЬ МОНТАЖ ⚡";
                 }
 
                 // Копируем команду в клипборд на случай ручной вставки
@@ -707,40 +692,16 @@
                     navigator.clipboard.writeText(`/start ${shortParam}`).catch(() => {});
                 }
 
-                // 3. Fallback: если sendData не закрыл окно за 250мс (например открыто из меню или браузера),
-                // отправляем в чат сообщение с кнопкой подтверждения через Telegram Bot API и закрываем окно.
-                setTimeout(async () => {
-                    const BOT_TOKEN = "9190852944:AAGeEct2i-N1jhYmOFLYcdlxwGaLt3Wsnlk";
-                    const userId = payload.user_id || 7454934683;
-
-                    try {
-                        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                chat_id: userId,
-                                text: desc,
-                                parse_mode: "Markdown",
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: btnText,
-                                                callback_data: `launch:${shortParam}`
-                                            }
-                                        ]
-                                    ]
-                                }
-                            })
-                        });
-                    } catch (apiErr) {
-                        console.error("API send error:", apiErr);
+                // 3. Fallback: если sendData не закрыл окно за 250мс, безопасно перенаправляем в бот через deep-link:
+                setTimeout(() => {
+                    const targetLink = `https://t.me/Vide_oro_bot?start=${shortParam}`;
+                    if (tg && typeof tg.openTelegramLink === 'function') {
+                        tg.openTelegramLink(targetLink);
+                    } else {
+                        window.location.href = targetLink;
                     }
-
                     if (tg && typeof tg.close === 'function') {
                         tg.close();
-                    } else {
-                        window.close();
                     }
                 }, 250);
 
