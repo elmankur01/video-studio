@@ -566,10 +566,11 @@
                 const dataStr = JSON.stringify(payload);
 
                 // 1. Попытка нативной передачи sendData
+                // ВНИМАНИЕ: Telegram сам автоматически закрывает WebApp при успехе sendData!
+                // НЕ вызываем tg.close(), чтобы не убить процесс до отправки данных в Telegram!
                 if (tg && typeof tg.sendData === 'function') {
                     try {
                         tg.sendData(dataStr);
-                        setTimeout(() => { if (tg?.close) tg.close(); }, 100);
                         return;
                     } catch (e) {
                         console.log("sendData error:", e);
