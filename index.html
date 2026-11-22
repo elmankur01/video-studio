@@ -416,10 +416,21 @@
         </div>
     </div>
 
-    <button class="btn-apply" onclick="applyChanges()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 18px; height: 18px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Применить & Смонтировать ⚡
-    </button>
+    <!-- Две раздельные кнопки -->
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <button id="saveBtn" class="btn-save" onclick="saveSettings()" style="width: 100%; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: var(--radius-lg); background: rgba(26, 36, 59, 0.9); color: var(--accent-cyan); font-size: 15px; font-weight: 700; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+            💾 1. Сохранить настройки
+        </button>
+
+        <button id="mountBtn" class="btn-apply" onclick="mountVideo()" style="width: 100%; border: none; border-radius: var(--radius-lg); background: var(--accent-gradient); color: #090d16; font-size: 16px; font-weight: 700; padding: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 6px 24px rgba(56, 189, 248, 0.35);">
+            ⚡ 2. СМОНТИРОВАТЬ В ЧАТЕ
+        </button>
+    </div>
+
+    <!-- Всплывающее уведомление о сохранении -->
+    <div id="saveToast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#059669; color:#fff; padding:12px 24px; border-radius:30px; font-weight:600; font-size:14px; box-shadow:0 10px 25px rgba(0,0,0,0.5); z-index:999999; animation:fadeIn 0.2s;">
+        ✅ Настройки сохранены! Нажмите «Смонтировать в чате».
+    </div>
 
     <!-- Встроенное гарантированное модальное окно на чистом HTML/CSS -->
     <div id="statusModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
@@ -500,68 +511,83 @@
             return '↘';
         }
 
-        function applyChanges() {
+        function getPayloadData() {
+            const urlInput = document.getElementById('videoUrl');
+            const urlVal = urlInput ? urlInput.value.trim() : '';
+
+            const startInput = document.getElementById('trimStart');
+            const startVal = startInput ? startInput.value.trim() : '';
+
+            const endInput = document.getElementById('trimEnd');
+            const endVal = endInput ? endInput.value.trim() : '';
+
+            let trimRange = null;
+            if (startVal || endVal) {
+                trimRange = (startVal || "0:00") + '-' + (endVal || "");
+            }
+
+            const captionInput = document.getElementById('captionText');
+            const captionVal = captionInput ? captionInput.value.trim() : '';
+
+            const userId = tg?.initDataUnsafe?.user?.id || 7454934683;
+
+            return {
+                user_id: userId,
+                url: urlVal || null,
+                file_name: selectedFile ? selectedFile.name : null,
+                is_gallery: !!selectedFile,
+                trim: trimRange,
+                quality: currentQuality,
+                subtitles: currentSubtitles,
+                caption: captionVal,
+                delogo: currentDelogo
+            };
+        }
+
+        function saveSettings() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            const toast = document.getElementById('saveToast');
+            if (toast) {
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.innerHTML = '✅ Настройки сохранены!';
+                saveBtn.style.borderColor = '#10b981';
+                saveBtn.style.color = '#10b981';
+            }
+        }
+
+        function mountVideo() {
             try {
-                const urlInput = document.getElementById('videoUrl');
-                const urlVal = urlInput ? urlInput.value.trim() : '';
-
-                const startInput = document.getElementById('trimStart');
-                const startVal = startInput ? startInput.value.trim() : '';
-
-                const endInput = document.getElementById('trimEnd');
-                const endVal = endInput ? endInput.value.trim() : '';
-
-                let trimRange = null;
-                if (startVal || endVal) {
-                    trimRange = (startVal || "0:00") + '-' + (endVal || "");
-                }
-
-                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-
-                const captionInput = document.getElementById('captionText');
-                const captionVal = captionInput ? captionInput.value.trim() : '';
-
-                const userId = tg?.initDataUnsafe?.user?.id || 7454934683;
-
-                const payload = {
-                    user_id: userId,
-                    url: urlVal || null,
-                    file_name: selectedFile ? selectedFile.name : null,
-                    is_gallery: !!selectedFile,
-                    trim: trimRange,
-                    quality: currentQuality,
-                    subtitles: currentSubtitles,
-                    caption: captionVal,
-                    delogo: currentDelogo
-                };
-
+                if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
+                const payload = getPayloadData();
                 const dataStr = JSON.stringify(payload);
 
-                // 1. Попытка прямой отправки через Telegram WebApp sendData (работает при открытии с клавиатуры)
-                let sentSuccessfully = false;
+                // 1. Попытка нативной передачи sendData
                 if (tg && typeof tg.sendData === 'function') {
                     try {
                         tg.sendData(dataStr);
-                        sentSuccessfully = true;
-                        tg.close();
+                        setTimeout(() => { if (tg?.close) tg.close(); }, 100);
                         return;
                     } catch (e) {
-                        console.log("sendData failed or not supported in this context:", e);
+                        console.log("sendData error:", e);
                     }
                 }
 
-                // 2. Если sendData недоступен (открыто не с Reply-клавиатуры или заблокирован клиентом)
+                // 2. Формируем прямой переход в бота
                 const qMap = {"720": "7", "480": "4", "360": "3", "mp3": "m"};
                 const sMap = {"none": "0", "ru": "r", "trans_ru": "u", "trans_en": "e"};
                 const dMap = {"tl": "1", "tr": "2", "bl": "3", "br": "4"};
-                const qChar = qMap[currentQuality] || "7";
-                const sChar = sMap[currentSubtitles] || "0";
-                const dChar = dMap[currentDelogo] || "0";
+                const qChar = qMap[payload.quality] || "7";
+                const sChar = sMap[payload.subtitles] || "0";
+                const dChar = dMap[payload.delogo] || "0";
                 let tStr = "0";
-                if (trimRange) {
-                    tStr = trimRange.replace(/:/g, "m").replace(/-/g, "_");
+                if (payload.trim) {
+                    tStr = payload.trim.replace(/:/g, "m").replace(/-/g, "_");
                 }
-                const hasUrl = urlVal ? "1" : "0";
+                const hasUrl = payload.url ? "1" : "0";
                 const shortParam = `s_${qChar}${sChar}${dChar}_${tStr}_${hasUrl}`;
                 const cmdText = `/start ${shortParam}`;
                 const directTgLink = `tg://resolve?domain=Vide_oro_bot&start=${shortParam}`;
@@ -572,27 +598,20 @@
                     navigator.clipboard.writeText(cmdText).catch(() => {});
                 }
 
-                // Показываем гарантированное модальное окно на странице
-                const modal = document.getElementById('statusModal');
-                const actionBtn = document.getElementById('modalActionBtn');
-                if (modal && actionBtn) {
-                    actionBtn.onclick = function(e) {
-                        e.preventDefault();
-                        if (tg && typeof tg.openTelegramLink === 'function') {
-                            tg.openTelegramLink(webTgLink);
-                        } else {
-                            window.location.href = directTgLink;
-                        }
-                        setTimeout(() => { if (tg?.close) tg.close(); }, 300);
-                    };
-                    modal.style.display = 'flex';
+                // Вызываем мгновенный переход в бот
+                if (tg && typeof tg.openTelegramLink === 'function') {
+                    tg.openTelegramLink(webTgLink);
                 } else {
-                    alert("⚡ Настройки применены! Перехожу в чат...");
                     window.location.href = directTgLink;
                 }
+                setTimeout(() => { if (tg?.close) tg.close(); }, 300);
             } catch (err) {
                 alert("Ошибка: " + err.message);
             }
+        }
+
+        function applyChanges() {
+            mountVideo();
         }
     </script>
 </body>
